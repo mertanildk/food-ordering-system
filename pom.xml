@@ -21,7 +21,7 @@
     </properties>
 
     <dependencyManagement>
-        <dependencies> </dependencies>
+        <dependencies>  </dependencies>
     </dependencyManagement>
     <build>
         <plugins>
