@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class Money {
+
+    public static final Money ZERO = new Money(BigDecimal.ZERO);//set amount 0
     private final BigDecimal amount;
 
     public Money(BigDecimal amount) {
@@ -21,14 +23,15 @@ public class Money {
     public Money add(Money money) {
         return new Money(setScale(this.amount.add(money.getAmount())));
     }
-    public Money subtract(Money money){
+
+    public Money subtract(Money money) {
         return new Money(setScale(this.amount.subtract(money.getAmount())));
     }
-    public Money multiply(int multiplier){
+
+    public Money multiply(int multiplier) {
         return new Money(setScale(this.amount.multiply(BigDecimal.valueOf(multiplier))));
 
     }
-
 
 
     private BigDecimal setScale(BigDecimal input) {// it will return bkz 1.4 -> 1 , 1.5 -> 2 , 1.6 -> 2 1.11111111 -> 1.11
