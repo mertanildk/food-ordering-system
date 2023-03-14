@@ -12,6 +12,7 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -36,9 +37,10 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
         price = builder.price;
         items = builder.items;
         setTrackingId(builder.trackingId);
-        setOrderStatus(builder.status);
+        setOrderStatus(builder.orderStatus);
         setFailureMessages(builder.failureMessages);
     }
+
 
     public void initializeOrder() {
         setId(new OrderId(UUID.randomUUID()));
@@ -55,26 +57,40 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
     }
 
 
-    @Getter
-    public static final class Builder {
-        private OrderId orderId;
-        private final CustomerId customerId;
-        private final RestaurantId restaurantId;
-        private final StreetAddress deliveryAddress;
-        private final Money price;
-        private final List<OrderItem> items;
-        private TrackingId trackingId;
-        private OrderStatus status;
-        private List<String> failureMessages;
-
-        public Builder(CustomerId customerId, RestaurantId restaurantId, StreetAddress deliveryAddress, Money price, List<OrderItem> items) {
-            this.customerId = customerId;
-            this.restaurantId = restaurantId;
-            this.deliveryAddress = deliveryAddress;
-            this.price = price;
-            this.items = items;
-        }
+    public void pay() {
+        if (!orderStatus.equals(OrderStatus.PENDING))
+            throw new OrderDomainException("Order is not in correct state for pay operation");
+        orderStatus = OrderStatus.PAID;
     }
+
+    public void approve() {
+        if (!orderStatus.equals(OrderStatus.PAID))
+            throw new OrderDomainException("Order is not in correct state for approve operation");
+        orderStatus = OrderStatus.APPROVED;
+    }
+
+    public void initCancel(List<String> failureMessages) {
+        if (!orderStatus.equals(OrderStatus.PAID))
+            throw new OrderDomainException("Order is not in correct state for initCancel operation");
+        orderStatus = OrderStatus.CANCELLING;
+        updateFailureMessages(failureMessages);
+    }
+
+    private void updateFailureMessages(List<String> failureMessages) {
+        if (this.failureMessages != null && failureMessages != null)
+            failureMessages.addAll(failureMessages.stream().filter(message -> !message.isEmpty()).toList());
+
+        if (this.failureMessages == null)
+            this.failureMessages = failureMessages;
+    }
+
+    public void cancel(List<String> failureMessages) {
+        if (!(orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.CANCELLING)))
+            throw new OrderDomainException("Order is not in correct state for cancel operation");
+        orderStatus = OrderStatus.CANCELLED;
+        updateFailureMessages(failureMessages);
+    }
+
 
     public void validateOrder() {
         validateInitialOrder();
@@ -111,6 +127,50 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
     private void validateInitialOrder() {
         if (orderStatus != null || getId() != null) {
             throw new OrderDomainException("Order is not in correct state for initialization!");
+        }
+    }
+
+    public static final class Builder {
+        private OrderId orderId;
+        private final CustomerId customerId;
+        private final RestaurantId restaurantId;
+        private final StreetAddress deliveryAddress;
+        private final Money price;
+        private final List<OrderItem> items;
+        private TrackingId trackingId;
+        private OrderStatus orderStatus;
+        private List<String> failureMessages;
+
+        public Builder(CustomerId customerId, RestaurantId restaurantId, StreetAddress deliveryAddress, Money price, List<OrderItem> items) {
+            this.customerId = customerId;
+            this.restaurantId = restaurantId;
+            this.deliveryAddress = deliveryAddress;
+            this.price = price;
+            this.items = items;
+        }
+
+        public Builder id(OrderId val) {
+            orderId = val;
+            return this;
+        }
+
+        public Builder trackingId(TrackingId val) {
+            trackingId = val;
+            return this;
+        }
+
+        public Builder orderStatus(OrderStatus val) {
+            orderStatus = val;
+            return this;
+        }
+
+        public Builder failureMessages(List<String> val) {
+            failureMessages = val;
+            return this;
+        }
+
+        public Order build() {
+            return new Order(this);
         }
     }
 }
