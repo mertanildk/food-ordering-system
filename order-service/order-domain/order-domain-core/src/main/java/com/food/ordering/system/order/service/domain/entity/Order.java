@@ -2,13 +2,16 @@ package com.food.ordering.system.order.service.domain.entity;
 
 import com.food.ordering.system.domain.entity.AggregateRoot;
 import com.food.ordering.system.domain.valueobject.*;
+import com.food.ordering.system.order.service.domain.exception.OrderDomainException;
+import com.food.ordering.system.order.service.domain.valueobject.OrderItemId;
 import com.food.ordering.system.order.service.domain.valueobject.StreetAddress;
 import com.food.ordering.system.order.service.domain.valueobject.TrackingId;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,7 +25,7 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
     private final Money price;
     private final List<OrderItem> items;
     private TrackingId trackingId;
-    private OrderStatus status;
+    private OrderStatus orderStatus;
     private List<String> failureMessages;
 
     private Order(Builder builder) {
@@ -33,9 +36,26 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
         price = builder.price;
         items = builder.items;
         setTrackingId(builder.trackingId);
-        setStatus(builder.status);
+        setOrderStatus(builder.status);
         setFailureMessages(builder.failureMessages);
     }
+
+    public void initializeOrder() {
+        setId(new OrderId(UUID.randomUUID()));
+        trackingId = new TrackingId(UUID.randomUUID());
+        orderStatus = OrderStatus.PENDING;
+        initializeOrderItems();
+    }
+
+    private void initializeOrderItems() {
+        long itemId = 1;
+        for (OrderItem orderItem : items) {
+            orderItem.initializeOrderItem(super.getId(), new OrderItemId(itemId++));
+        }
+    }
+
+
+    @Getter
     public static final class Builder {
         private OrderId orderId;
         private final CustomerId customerId;
@@ -54,29 +74,43 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
             this.price = price;
             this.items = items;
         }
+    }
 
-        public Builder id(OrderId val) {
-            orderId = val;
-            return this;
+    public void validateOrder() {
+        validateInitialOrder();
+        validateTotalPrice();
+        validateItemsPrice();
+
+    }
+
+    private void validateItemsPrice() {
+        Money ordersItemTotal =
+                items.stream().map(orderItem -> {
+                    validateItemPrice(orderItem);
+                    return orderItem.getSubTotal();
+                }).reduce(Money.ZERO, Money::add);
+        if (!price.equals(ordersItemTotal)) {
+            throw new OrderDomainException("Total price: " + price.getAmount()
+                    + " is not equals to Order items total:" + ordersItemTotal.getAmount());
         }
+    }
 
-        public Builder trackingId(TrackingId val) {
-            trackingId = val;
-            return this;
+    private void validateItemPrice(OrderItem orderItem) {
+        if (!orderItem.isPriceValid()) {
+            throw new OrderDomainException("Order item price: " + orderItem.getPrice().getAmount()
+                    + " is not valid for product " + orderItem.getProduct().getId().getValue());
         }
+    }
 
-        public Builder status(OrderStatus val) {
-            status = val;
-            return this;
+    private void validateTotalPrice() {
+        if (price == null || !price.isGreaterThanZero()) {
+            throw new OrderDomainException("Total amount must be greater than Zero");
         }
+    }
 
-        public Builder failureMessages(List<String> val) {
-            failureMessages = val;
-            return this;
-        }
-
-        public Order build() {
-            return new Order(this);
+    private void validateInitialOrder() {
+        if (orderStatus != null || getId() != null) {
+            throw new OrderDomainException("Order is not in correct state for initialization!");
         }
     }
 }
