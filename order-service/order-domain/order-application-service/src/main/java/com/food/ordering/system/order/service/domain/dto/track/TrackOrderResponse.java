@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Builder
 @AllArgsConstructor
-public class TrackOrderResponseClass {//client trackOrderQuery classı göderdikten sonra clienta dönülecek olan reponse.
+public class TrackOrderResponse {//client trackOrderQuery classı göderdikten sonra clienta dönülecek olan reponse.
     @NotNull
     private final UUID orderTrackingId;
     @NotNull
