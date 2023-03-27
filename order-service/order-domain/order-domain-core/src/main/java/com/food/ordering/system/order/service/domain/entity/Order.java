@@ -6,16 +6,16 @@ import com.food.ordering.system.order.service.domain.exception.OrderDomainExcept
 import com.food.ordering.system.order.service.domain.valueobject.OrderItemId;
 import com.food.ordering.system.order.service.domain.valueobject.StreetAddress;
 import com.food.ordering.system.order.service.domain.valueobject.TrackingId;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Builder
 public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanacak
 
     //final : Order oluşturma esnasında dolu olması gereken alanlar (final)
@@ -29,18 +29,17 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
     private OrderStatus orderStatus;
     private List<String> failureMessages;
 
-    private Order(Builder builder) {
-        super.setId(builder.orderId);
-        customerId = builder.customerId;
-        restaurantId = builder.restaurantId;
-        deliveryAddress = builder.deliveryAddress;
-        price = builder.price;
-        items = builder.items;
-        setTrackingId(builder.trackingId);
-        setOrderStatus(builder.orderStatus);
-        setFailureMessages(builder.failureMessages);
+    public Order(OrderId orderId, CustomerId customerId, RestaurantId restaurantId, StreetAddress deliveryAddress, Money price, List<OrderItem> items, TrackingId trackingId, OrderStatus orderStatus, List<String> failureMessages) {
+        super.setId(orderId);
+        this.customerId = customerId;
+        this.restaurantId = restaurantId;
+        this.deliveryAddress = deliveryAddress;
+        this.price = price;
+        this.items = items;
+        this.trackingId = trackingId;
+        this.orderStatus = orderStatus;
+        this.failureMessages = failureMessages;
     }
-
 
     public void initializeOrder() {
         setId(new OrderId(UUID.randomUUID()));
@@ -127,50 +126,6 @@ public class Order extends AggregateRoot<OrderId> {//Id OrderId olarak ayarlanac
     private void validateInitialOrder() {
         if (orderStatus != null || getId() != null) {
             throw new OrderDomainException("Order is not in correct state for initialization!");
-        }
-    }
-
-    public static final class Builder {
-        private OrderId orderId;
-        private final CustomerId customerId;
-        private final RestaurantId restaurantId;
-        private final StreetAddress deliveryAddress;
-        private final Money price;
-        private final List<OrderItem> items;
-        private TrackingId trackingId;
-        private OrderStatus orderStatus;
-        private List<String> failureMessages;
-
-        public Builder(CustomerId customerId, RestaurantId restaurantId, StreetAddress deliveryAddress, Money price, List<OrderItem> items) {
-            this.customerId = customerId;
-            this.restaurantId = restaurantId;
-            this.deliveryAddress = deliveryAddress;
-            this.price = price;
-            this.items = items;
-        }
-
-        public Builder id(OrderId val) {
-            orderId = val;
-            return this;
-        }
-
-        public Builder trackingId(TrackingId val) {
-            trackingId = val;
-            return this;
-        }
-
-        public Builder orderStatus(OrderStatus val) {
-            orderStatus = val;
-            return this;
-        }
-
-        public Builder failureMessages(List<String> val) {
-            failureMessages = val;
-            return this;
-        }
-
-        public Order build() {
-            return new Order(this);
         }
     }
 }
