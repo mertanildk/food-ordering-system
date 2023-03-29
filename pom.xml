@@ -22,6 +22,7 @@
         <lombok.version>1.18.26</lombok.version>
         <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mockito-version>4.4.0</mockito-version>
     </properties>
 
     <dependencyManagement>
@@ -55,6 +56,13 @@
                 <groupId>com.food.ordering.system</groupId>
                 <artifactId>common-domain</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <!-- Mokito Test -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito-version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
