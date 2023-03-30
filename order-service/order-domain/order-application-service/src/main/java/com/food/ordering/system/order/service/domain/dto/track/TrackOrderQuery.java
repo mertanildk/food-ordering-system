@@ -11,8 +11,8 @@ import java.util.UUID;
 @Getter
 @Builder
 @AllArgsConstructor
-public class TrackOrderQuery {//client siparişin en son durumunu sorgulamak için bu classı kullanacak
+public class TrackOrderQuery {
     @NotNull
-    private final UUID trackingId;
-
+    private final UUID orderTrackingId;
 }
+
