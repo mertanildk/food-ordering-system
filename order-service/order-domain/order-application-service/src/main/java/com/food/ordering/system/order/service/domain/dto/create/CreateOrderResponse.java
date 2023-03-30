@@ -12,12 +12,11 @@ import java.util.UUID;
 @Getter
 @Builder
 @AllArgsConstructor
-public class CreateOrderResponse {//clientlara dönecek response dto
+public class CreateOrderResponse {
     @NotNull
-    private final UUID orderTrackingId;
+    private final UUID orderTackingId;
     @NotNull
     private final OrderStatus orderStatus;
     @NotNull
     private final String message;
-
 }
