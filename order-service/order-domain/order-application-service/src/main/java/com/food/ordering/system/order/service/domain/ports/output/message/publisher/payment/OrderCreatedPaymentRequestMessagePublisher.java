@@ -8,5 +8,5 @@ import com.food.ordering.system.order.service.domain.event.OrderCreatedEvent;
  * Bu interface, OrderCreatedEvent'i payment servisine  yaymak için kullanılır
  */
 public interface OrderCreatedPaymentRequestMessagePublisher extends DomainEventPublisher<OrderCreatedEvent> {
-
 }
+

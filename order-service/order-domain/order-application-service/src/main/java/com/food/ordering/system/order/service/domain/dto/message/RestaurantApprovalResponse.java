@@ -11,12 +11,12 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class RestaurantApprovalResponse {//ikinci mesaj response sipariş onay için.
+public class RestaurantApprovalResponse {
     private String id;
     private String sagaId;
     private String orderId;
     private String restaurantId;
     private Instant createdAt;
-    private OrderApprovalStatus orderApprovalStatus;//Sipariş onayı statusu
-    private List<String> failureMessage;
+    private OrderApprovalStatus orderApprovalStatus;
+    private List<String> failureMessages;
 }

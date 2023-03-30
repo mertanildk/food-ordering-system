@@ -18,5 +18,4 @@ public class TrackOrderResponse {//client trackOrderQuery classı göderdikten s
     @NotNull
     private final OrderStatus orderStatus;
     private final List<String> failureMessages;//başarısızlık mesajlarını da dönüyoruz.
-
 }

@@ -6,12 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-@Service
-@Validated
 @Slf4j
+@Validated
+@Service
 public class PaymentResponseMessageListenerImp implements PaymentResponseMessageListener {
-
-
 
     @Override
     public void paymentCompleted(PaymentResponse paymentResponse) {

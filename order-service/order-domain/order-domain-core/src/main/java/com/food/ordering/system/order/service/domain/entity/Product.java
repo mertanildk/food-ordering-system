@@ -6,8 +6,6 @@ import com.food.ordering.system.domain.valueobject.ProductId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor(staticName = "of")
 public class Product extends BaseEntity<ProductId> {
     private String name;
     private Money price;
@@ -17,12 +15,21 @@ public class Product extends BaseEntity<ProductId> {
         this.name = name;
         this.price = price;
     }
-    public Product(ProductId productId){
+
+    public Product(ProductId productId) {
         super.setId(productId);
     }
 
     public void updateWithConfirmedNameAndPrice(String name, Money price) {
         this.name = name;
         this.price = price;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Money getPrice() {
+        return price;
     }
 }

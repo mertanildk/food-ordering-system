@@ -7,10 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 
-@Service
 @Slf4j
 @Validated
+@Service
 public class RestaurantApprovalResponseMessageListenerImp implements RestaurantApprovalResponseMessageListener {
+
     @Override
     public void orderApproved(RestaurantApprovalResponse restaurantApprovalResponse) {
 

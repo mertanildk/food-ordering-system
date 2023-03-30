@@ -11,7 +11,7 @@ import jakarta.validation.Valid;
  * This interface is used to create order and track order
  * bu interface sipariş oluşturmak ve siparişin durumunu takip etmek için kullanılır.
  */
-public interface OrderApplicationService {//client tarafından kullanılacak olan service
+public interface OrderApplicationService {
 
     CreateOrderResponse createOrder(@Valid CreateOrderCommand createOrderCommand);
 
